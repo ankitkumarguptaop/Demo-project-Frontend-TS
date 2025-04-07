@@ -1,0 +1,21 @@
+.form{
+    width: 100%;
+    align-items: center;
+}
+
+#input {
+    width:50%;
+    margin-right: 20px;
+    border: none;
+    background: #3797EF;
+    padding: 10px 20px;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    transition: background .2s ease-in-out;
+  }
+  
+  #input {
+    width:50%;
+    background: #3797ED;
+  }
