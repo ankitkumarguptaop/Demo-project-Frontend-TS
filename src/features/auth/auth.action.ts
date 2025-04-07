@@ -5,28 +5,56 @@ import {
 } from "../../services/auth.service";
 import { SIGNIN, SIGNUP } from "./auth.type";
 
-export const signUpUser = createAsyncThunk(SIGNUP, async (payload , { rejectWithValue }) => {
-  try {
-  const response = await signupUserService(payload);
-  const data = response.data;
-  console.log("res data", data);
-  return data;
-  }
-  catch(error:any){
-    console.log(error)
-    return rejectWithValue(error.response.data)
-  }
-});
+export interface SignUpPayload {
+  name: string;
+  email: string;
+  password: string;
+  profilePic: File;
+  role: "normal" | "admin" | "superadmin";
+}
 
-export const signInUser = createAsyncThunk(SIGNIN, async (payload , { rejectWithValue }) => {
-  try {
-  const response = await signinUserService(payload);
-  const data = response.data;
-  console.log("res data", data);
-  return data;
+export interface AuthResponse {
+  token: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    profilePic?: string;
+  };
+}
+
+export interface SignInPayload {
+  email: string;
+  password: string;
+}
+
+export const signUpUser = createAsyncThunk<AuthResponse, FormData>(
+  SIGNUP,
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await signupUserService(payload);
+      const data: AuthResponse = response.data;
+      console.log("Signup response data:", data);
+      return data;
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      return rejectWithValue(error.response?.data || "Signup failed");
+    }
   }
-  catch(error:any){
-    console.log(error.response.data)
-    return rejectWithValue(error.response.data)
+);
+
+export const signInUser = createAsyncThunk<AuthResponse, SignInPayload>(
+  SIGNIN,
+  async (payload:SignInPayload, { rejectWithValue }) => {
+    try {
+      const response = await signinUserService(payload);
+      const data: AuthResponse = response.data;
+      console.log("Signin response data:", data);
+      return data;
+    } catch (error: any) {
+      console.error("Signin error:", error);
+      return rejectWithValue(error.response?.data || "Signin failed");
+    }
   }
-});
+);

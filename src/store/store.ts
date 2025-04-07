@@ -2,8 +2,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../features/auth/auth.slice";
 
-
-
 import storage from "redux-persist/lib/storage";
 import { persistStore, persistReducer } from "redux-persist";
 
@@ -29,3 +27,6 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
+export type AppStore = typeof store;
+export type RootStateType = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

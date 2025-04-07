@@ -15,40 +15,45 @@ import { FormControl } from "@mui/material";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch } from "react-redux";
-import { signInUser, signUpUser } from "@/features/auth/auth.action";
+import { signUpUser } from "@/features/auth/auth.action";
 import { redirect } from "next/navigation";
 import facebook from "../../../assets/images/Icon.png";
 import Image from "next/image";
 import Link from "next/link";
 import { enqueueSnackbar } from "notistack";
 
+// Define Zod schema
+const formSchema = z.object({
+  password: z
+    .string()
+    .min(1, "Enter valid Password")
+    .regex(
+      /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$/,
+      "Enter valid Password"
+    ),
+  email: z.string().email("Enter valid Email").min(1),
+  name: z
+    .string()
+    .transform((value) => value.replace(/\s+/g, ""))
+    .pipe(z.string().min(3, "Enter valid Name")),
+  profilePic: z.any(),
+  role: z.enum(["normal", "admin", "superadmin"]),
+});
+
+// Infer TypeScript types from Zod schema
+type FormData = z.infer<typeof formSchema>;
+
 const SignUp = () => {
-  const formSchema = z.object({
-    password: z
-      .string()
-      .min(1, "Enter valid Password")
-      .regex(
-        new RegExp(/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$/),
-        "Enter valid Password"
-      ),
-    email: z.string().email("Enter valid Email").min(1),
-    name: z
-      .string()
-      .transform((value) => value.replace(/\s+/g, ""))
-      .pipe(z.string().min(3, "Enter valid Name")),
-    profilePic: z.any(),
-    role: z.enum(["normal", "admin", "superadmin"]),
-  });
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<any>();
+
   const {
     control,
-    name,
     register,
     handleSubmit,
     setValue,
     formState: { errors },
     reset,
-  } = useForm({
+  } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -59,9 +64,8 @@ const SignUp = () => {
     },
   });
 
-  const onSubmit = async (data) => {
-    console.log("✌️data --->", data);
-    let formdata = new FormData();
+  const onSubmit = async (data: FormData) => {
+    const formdata = new FormData();
     formdata.append("name", data.name);
     formdata.append("password", data.password);
     formdata.append("email", data.email);
@@ -78,17 +82,14 @@ const SignUp = () => {
       reset();
       redirect("/");
     }
- 
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
+  const handleImageUpload = (e:any) => {
+    const file = e.target.files?.[0];
     if (file) {
       setValue("profilePic", file);
     }
   };
-
-  function changeRole(e) {}
 
   return (
     <FormControl className={style["form"]}>
@@ -100,7 +101,7 @@ const SignUp = () => {
           feildName="name"
           margin={"10px 0px"}
           errors={errors}
-        ></Input>
+        />
         <Input
           width="100%"
           lable={"Email"}
@@ -108,44 +109,42 @@ const SignUp = () => {
           feildName="email"
           margin={"10px 0px"}
           errors={errors}
-        ></Input>
-
+        />
         <Input
           width="100%"
           lable={"Password"}
-          margin={"10px 0px"}
           register={register}
           feildName="password"
+          margin={"10px 0px"}
           errors={errors}
-        ></Input>
+        />
         <FormControl sx={{ width: "100%" }}>
           <InputLabel id="demo-simple-select-label">Role</InputLabel>
           <Controller
-            name={"role"}
+            name="role"
             control={control}
             render={({ field }) => (
               <Select
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 label="Role"
-                value={field.value}
                 {...field}
               >
-                <MenuItem value={"normal"}>Normal</MenuItem>
-                <MenuItem value={"admin"}>Admin</MenuItem>
-                <MenuItem value={"superadmin"}>SuperAdmin</MenuItem>
+                <MenuItem value="normal">Normal</MenuItem>
+                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="superadmin">SuperAdmin</MenuItem>
               </Select>
             )}
-            defaultValue={"normal"}
           />
         </FormControl>
       </Box>
+
       <Box
         sx={{ width: "90%", marginTop: "5px" }}
-        variant="contained"
+      
         component="label"
       >
-        <input  id="input" type="file" onChange={handleImageUpload} />
+        <input id="input" type="file" onChange={handleImageUpload} />
       </Box>
 
       <Button
@@ -161,7 +160,7 @@ const SignUp = () => {
           marginTop: "20px",
         }}
       >
-        Sign Up {name}
+        Sign Up
       </Button>
 
       <Box
@@ -176,19 +175,19 @@ const SignUp = () => {
         <Box
           sx={{
             position: "relative",
-            width: `${17}px`,
-            height: `${17}px`,
+            width: "17px",
+            height: "17px",
             paddingRight: 3,
           }}
         >
           <Image
             src={facebook}
-            alt="facebok"
+            alt="facebook"
             fill
             style={{ objectFit: "contain" }}
           />
         </Box>
-        Log in with Facebook{" "}
+        Log in with Facebook
       </Box>
 
       <Box
@@ -227,10 +226,10 @@ const SignUp = () => {
         ></Box>
       </Box>
 
-      <Box display={"flex"} color={"#808080"}>
+      <Box display="flex" color="#808080">
         Already have an account?{" "}
         <Link
-          href={"./"}
+          href="./"
           style={{
             color: "#3797EF",
             textTransform: "none",
@@ -241,7 +240,7 @@ const SignUp = () => {
           Sign In.
         </Link>
       </Box>
-      <Box marginTop={13} color={"#808080"}>
+      <Box marginTop={13} color="#808080">
         Instagram от Facebook
       </Box>
     </FormControl>

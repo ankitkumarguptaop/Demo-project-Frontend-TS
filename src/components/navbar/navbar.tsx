@@ -12,7 +12,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
@@ -63,7 +62,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function PrimarySearchAppBar() {
   const dispatch = useDispatch();
 
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state : any) => state.auth.currentUser);
   console.log("✌️currentUser --->", currentUser);
   const [profilePicture] = useState(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/${currentUser?.user?.profile_image}`
@@ -78,7 +77,7 @@ export default function PrimarySearchAppBar() {
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
-  const handleProfileMenuOpen = (event) => {
+  const handleProfileMenuOpen = (event :any) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -91,7 +90,7 @@ export default function PrimarySearchAppBar() {
     handleMobileMenuClose();
   };
 
-  const handleMobileMenuOpen = (event) => {
+  const handleMobileMenuOpen = (event:any) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
 

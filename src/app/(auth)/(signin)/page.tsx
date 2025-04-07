@@ -3,36 +3,41 @@ import React from "react";
 import Input from "../../../components/input/input";
 import { Box, Button, Typography } from "@mui/material";
 import style from "./signin.module.css";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import { FormControl } from "@mui/material";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch } from "react-redux";
-import { signInUser  } from "@/features/auth/auth.action";
+import {  signInUser } from "@/features/auth/auth.action";
 import { redirect } from "next/navigation";
 import facebook from "../../../assets/images/Icon.png";
 import Image from "next/image";
 import Link from "next/link";
 import { enqueueSnackbar } from "notistack";
+import { AppDispatch } from "@/store/store";
+
+const formSchema = z.object({
+  email: z.string().email("Enter valid Email").min(1),
+  password: z
+    .string()
+    .min(1, "Enter valid Password")
+    .regex(
+      new RegExp(/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$/),
+      "Enter valid Password"
+    ),
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 const SignIn = () => {
-  const formSchema = z.object({
-    password: z
-      .string()
-      .min(1, "Enter valid Password")
-      .regex(
-        new RegExp(/^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,16}$/),
-        "Enter valid Password"
-      ),
-    email: z.string().email("Enter valid Email").min(1),
-  });
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+
   const {
-    register :any,
-    handleSubmit :UseFormHandleSubmit,
-    formState: { errors : <FieldErrors>},
+    register,
+    handleSubmit,
+    formState: { errors },
     reset,
-  } = useForm({
+  } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -40,17 +45,18 @@ const SignIn = () => {
     },
   });
 
-  const onSubmit = async (data:any) :Promise<any>=> {
-   const response : Promise<any> =  await dispatch(signInUser({ email: data.email, password: data.password }))
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
+    const response: any = await dispatch<any>(
+      signInUser({ email: data.email, password: data.password })
+    );
 
-        if (response?.meta?.requestStatus === "fulfilled") {
-          enqueueSnackbar("Sucessfuly Loged in", {
-            variant: "success",
-            autoHideDuration: 5000,
-          });
-          redirect("/home");
-        }
-      }
+    if (response?.meta?.requestStatus === "fulfilled") {
+      enqueueSnackbar("Successfully Logged in", {
+        variant: "success",
+        autoHideDuration: 5000,
+      });
+      redirect("/home");
+    }
 
     reset();
   };
@@ -60,22 +66,22 @@ const SignIn = () => {
       <Box sx={{ width: "90%" }}>
         <Input
           width="100%"
-          lable={"Email"}
+          lable="Email"
           register={register}
           feildName="email"
-          margin={"10px 0px"}
+          margin="10px 0px"
           errors={errors}
-        ></Input>
-
+        />
         <Input
           width="100%"
-          lable={"Password"}
-          margin={"10px 0px"}
+          lable="Password"
+          margin="10px 0px"
           register={register}
           feildName="password"
           errors={errors}
-        ></Input>
+        />
       </Box>
+
       <Box className={style["forgot-password"]}>
         <Typography
           alignSelf="right"
@@ -87,6 +93,7 @@ const SignIn = () => {
           Forgot password?
         </Typography>
       </Box>
+
       <Button
         type="submit"
         onClick={handleSubmit(onSubmit)}
@@ -115,19 +122,19 @@ const SignIn = () => {
         <Box
           sx={{
             position: "relative",
-            width: `${17}px`,
-            height: `${17}px`,
+            width: 17,
+            height: 17,
             paddingRight: 3,
           }}
         >
           <Image
             src={facebook}
-            alt="facebok"
+            alt="facebook"
             fill
             style={{ objectFit: "contain" }}
           />
         </Box>
-        Log in with Facebook{" "}
+        Log in with Facebook
       </Box>
 
       <Box
@@ -167,7 +174,7 @@ const SignIn = () => {
       </Box>
 
       <Box display={"flex"} color={"#808080"}>
-        Don’t have an account?{" "}
+        Don’t have an account?
         <Link
           href={"./signup"}
           style={{
@@ -180,6 +187,7 @@ const SignIn = () => {
           Sign up.
         </Link>
       </Box>
+
       <Box marginTop={20} color={"#808080"}>
         Instagram от Facebook
       </Box>
